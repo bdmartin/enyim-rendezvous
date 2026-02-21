@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Description>A Rendezvous / HRW (Highest Random Weight) hashing node locator for EnyimMemcachedCore with AWS ElastiCache auto-discovery support.</Description>
+    <Authors>bdmartin</Authors>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageTags>memcached;rendezvous;hrw;hashing;elasticache;aws;enyim;caching</PackageTags>
+    <RepositoryUrl>https://github.com/bdmartin/enyim-rendezvous</RepositoryUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="EnyimMemcachedCore" Version="2.5.4" />
+  </ItemGroup>
+
+</Project>
