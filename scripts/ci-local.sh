@@ -4,8 +4,9 @@
 #   restore → Release build (warnings-as-errors) → test with code coverage
 #
 # Usage:
-#   ./scripts/ci-local.sh           # run all checks
-#   ./scripts/ci-local.sh --report  # also generate an HTML coverage report (requires reportgenerator)
+#   ./scripts/ci-local.sh             # run checks, print coverage summary
+#   ./scripts/ci-local.sh --report    # also generate an HTML coverage report
+#   ./scripts/ci-local.sh --no-report # skip coverage report generation
 #
 set -euo pipefail
 
@@ -13,15 +14,22 @@ SOLUTION="Enyim.Caching.Rendezvous.sln"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 COVERAGE_DIR="$REPO_ROOT/coverage"
-GENERATE_REPORT=false
+GENERATE_REPORT=true
 
 for arg in "$@"; do
   case "$arg" in
     --report) GENERATE_REPORT=true ;;
+    --no-report) GENERATE_REPORT=false ;;
   esac
 done
 
 cd "$REPO_ROOT"
+
+# Ensure local tools (reportgenerator) are available
+dotnet tool restore --verbosity quiet
+
+# Clean previous coverage results to avoid stale data
+rm -rf "$COVERAGE_DIR"
 
 echo "==> Restoring dependencies..."
 dotnet restore "$SOLUTION"
@@ -38,23 +46,22 @@ dotnet test "$SOLUTION" \
   --results-directory "$COVERAGE_DIR"
 
 echo "==> All CI checks passed."
+echo ""
 
-# Find the generated coverage file
-COVERAGE_FILE=$(find "$COVERAGE_DIR" -name "coverage.cobertura.xml" -type f | head -1)
+# Generate coverage reports
+echo "==> Coverage summary:"
+dotnet reportgenerator \
+  "-reports:$COVERAGE_DIR/**/coverage.cobertura.xml" \
+  "-targetdir:$COVERAGE_DIR/report" \
+  "-reporttypes:TextSummary;Html" \
+  -verbosity:Warning
 
-if [[ -n "${COVERAGE_FILE:-}" ]]; then
-  echo "==> Coverage report: $COVERAGE_FILE"
+# Print the text summary to the console
+if [[ -f "$COVERAGE_DIR/report/Summary.txt" ]]; then
+  cat "$COVERAGE_DIR/report/Summary.txt"
 fi
 
 if [[ "$GENERATE_REPORT" == "true" ]]; then
-  if command -v reportgenerator &>/dev/null; then
-    echo "==> Generating HTML coverage report..."
-    reportgenerator \
-      "-reports:$COVERAGE_DIR/**/coverage.cobertura.xml" \
-      "-targetdir:$COVERAGE_DIR/report" \
-      "-reporttypes:Html"
-    echo "==> HTML report: $COVERAGE_DIR/report/index.html"
-  else
-    echo "==> reportgenerator not found. Install with: dotnet tool install -g dotnet-reportgenerator-globaltool"
-  fi
+  echo ""
+  echo "==> HTML report: $COVERAGE_DIR/report/index.html"
 fi
