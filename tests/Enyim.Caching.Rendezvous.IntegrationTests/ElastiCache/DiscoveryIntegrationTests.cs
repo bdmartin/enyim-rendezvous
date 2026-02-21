@@ -52,6 +52,10 @@ namespace Enyim.Caching.Rendezvous.IntegrationTests.ElastiCache
                 {
                     // Listener was disposed
                 }
+                catch (InvalidOperationException)
+                {
+                    // Listener was stopped before AcceptTcpClient returned
+                }
             });
 
             return endpoint;
