@@ -140,7 +140,9 @@ namespace Enyim.Caching.Rendezvous
         }
 
         /// <summary>
-        /// Releases the internal read-write lock.
+        /// Releases the internal read-write lock and marks the instance as disposed.
+        /// Subsequent calls to <see cref="Initialize"/>, <see cref="Locate"/>, and
+        /// <see cref="GetWorkingNodes"/> will throw <see cref="ObjectDisposedException"/>.
         /// </summary>
         public void Dispose()
         {

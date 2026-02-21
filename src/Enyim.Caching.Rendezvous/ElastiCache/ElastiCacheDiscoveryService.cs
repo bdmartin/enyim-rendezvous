@@ -193,7 +193,8 @@ namespace Enyim.Caching.Rendezvous.ElastiCache
         }
 
         /// <summary>
-        /// Stops polling and releases all resources.
+        /// Stops polling and releases all resources. This method blocks until any
+        /// in-flight poll callback completes.
         /// </summary>
         public void Dispose()
         {
