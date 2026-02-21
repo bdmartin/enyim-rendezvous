@@ -32,5 +32,9 @@ project.lock.json
 ## Artifacts
 artifacts/
 
+## Benchmarks & Profiler
+BenchmarkDotNet.Artifacts/
+profiler-results/
+
 ## Claude Code
 .claude/
