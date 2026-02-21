@@ -96,6 +96,10 @@ namespace Enyim.Caching.Rendezvous.Tests
                 {
                     // Listener was disposed
                 }
+                catch (InvalidOperationException)
+                {
+                    // Listener was stopped before AcceptTcpClient returned
+                }
             });
 
             return endpoint;
