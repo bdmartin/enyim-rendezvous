@@ -21,6 +21,7 @@ obj/
 [Dd]ebug/
 [Rr]elease/
 TestResults/
+coverage/
 
 ## NuGet
 packages/
