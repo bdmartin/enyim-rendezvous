@@ -14,13 +14,21 @@ namespace Enyim.Caching.Rendezvous.Hashing
     {
         private readonly uint _seed;
 
+        /// <summary>
+        /// Initializes a new instance with seed 0.
+        /// </summary>
         public MurmurHash3RendezvousHash() : this(0) { }
 
+        /// <summary>
+        /// Initializes a new instance with the specified seed.
+        /// </summary>
+        /// <param name="seed">The MurmurHash3 seed value.</param>
         public MurmurHash3RendezvousHash(uint seed)
         {
             _seed = seed;
         }
 
+        /// <inheritdoc />
         public uint ComputeHash(string key, string node)
         {
             // Combine key + null separator + node to produce input

@@ -11,6 +11,12 @@ namespace Enyim.Caching.Rendezvous.ElastiCache
     /// </summary>
     public sealed class ClusterNode : IEquatable<ClusterNode>
     {
+        /// <summary>
+        /// Initializes a new <see cref="ClusterNode"/> with the given host, IP address, and port.
+        /// </summary>
+        /// <param name="hostName">The DNS host name of the cache node.</param>
+        /// <param name="ipAddress">The resolved IP address of the cache node.</param>
+        /// <param name="port">The memcached port number.</param>
         public ClusterNode(string hostName, IPAddress ipAddress, int port)
         {
             HostName = hostName ?? throw new ArgumentNullException(nameof(hostName));
@@ -19,11 +25,19 @@ namespace Enyim.Caching.Rendezvous.ElastiCache
             EndPoint = new IPEndPoint(ipAddress, port);
         }
 
+        /// <summary>Gets the DNS host name of the cache node.</summary>
         public string HostName { get; }
+
+        /// <summary>Gets the resolved IP address of the cache node.</summary>
         public IPAddress IpAddress { get; }
+
+        /// <summary>Gets the memcached port number.</summary>
         public int Port { get; }
+
+        /// <summary>Gets the endpoint (IP + port) for connecting to this node.</summary>
         public IPEndPoint EndPoint { get; }
 
+        /// <inheritdoc />
         public bool Equals(ClusterNode other)
         {
             if (other == null) return false;
@@ -32,8 +46,10 @@ namespace Enyim.Caching.Rendezvous.ElastiCache
                 && Port == other.Port;
         }
 
+        /// <inheritdoc />
         public override bool Equals(object obj) => Equals(obj as ClusterNode);
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             unchecked
@@ -46,6 +62,7 @@ namespace Enyim.Caching.Rendezvous.ElastiCache
             }
         }
 
+        /// <inheritdoc />
         public override string ToString() => $"{HostName}|{IpAddress}|{Port}";
     }
 }

@@ -14,6 +14,7 @@ namespace Enyim.Caching.Rendezvous.Hashing
     /// </summary>
     public sealed class Sha256RendezvousHash : IRendezvousHash
     {
+        /// <inheritdoc />
         public uint ComputeHash(string key, string node)
         {
             var input = Encoding.UTF8.GetBytes(key + "\0" + node);
