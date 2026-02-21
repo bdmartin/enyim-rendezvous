@@ -25,4 +25,11 @@ TestResults/
 ## NuGet
 packages/
 *.nupkg
+*.snupkg
 project.lock.json
+
+## Artifacts
+artifacts/
+
+## Claude Code
+.claude/

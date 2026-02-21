@@ -2,18 +2,32 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
     <Description>A Rendezvous / HRW (Highest Random Weight) hashing node locator for EnyimMemcachedCore with AWS ElastiCache auto-discovery support.</Description>
     <Authors>bdmartin</Authors>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageTags>memcached;rendezvous;hrw;hashing;elasticache;aws;enyim;caching</PackageTags>
     <RepositoryUrl>https://github.com/bdmartin/enyim-rendezvous</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Version>0.0.0-dev</Version>
+    <Copyright>Copyright (c) bdmartin</Copyright>
+    <PackageProjectUrl>https://github.com/bdmartin/enyim-rendezvous</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="EnyimMemcachedCore" Version="2.5.4" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
   <PackageReference Include="System.Text.Encodings.Web" Version="4.5.1" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

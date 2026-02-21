@@ -14,6 +14,7 @@ namespace Enyim.Caching.Rendezvous.Hashing
         private const uint FnvOffsetBasis = 2166136261;
         private const uint FnvPrime = 16777619;
 
+        /// <inheritdoc />
         public uint ComputeHash(string key, string node)
         {
             uint hash = FnvOffsetBasis;
