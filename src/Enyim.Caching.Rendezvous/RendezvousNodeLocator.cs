@@ -46,6 +46,8 @@ namespace Enyim.Caching.Rendezvous
         /// <inheritdoc />
         public void Initialize(IList<IMemcachedNode> nodes)
         {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(RendezvousNodeLocator));
             if (nodes == null)
                 throw new ArgumentNullException(nameof(nodes));
 
@@ -70,6 +72,8 @@ namespace Enyim.Caching.Rendezvous
         /// <inheritdoc />
         public IMemcachedNode Locate(string key)
         {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(RendezvousNodeLocator));
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
 
@@ -113,6 +117,8 @@ namespace Enyim.Caching.Rendezvous
         /// <inheritdoc />
         public IEnumerable<IMemcachedNode> GetWorkingNodes()
         {
+            if (_disposed)
+                throw new ObjectDisposedException(nameof(RendezvousNodeLocator));
             _lock.EnterReadLock();
             try
             {
