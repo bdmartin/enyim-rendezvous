@@ -25,6 +25,8 @@ Thanks for your interest in contributing to enyim-rendezvous!
 
 This project uses an `.editorconfig` to enforce formatting. Most editors will pick it up automatically.
 
+All public types and members require XML documentation comments. The build enables `GenerateDocumentationFile` with `TreatWarningsAsErrors`, so missing comments will cause a build failure (CS1591).
+
 ## Reporting Issues
 
 Please use the [issue templates](https://github.com/bdmartin/enyim-rendezvous/issues/new/choose) when filing bugs or feature requests.
