@@ -15,8 +15,20 @@ A .NET library that implements Rendezvous (Highest Random Weight) hashing as a n
 # Run a single test by name
 dotnet test tests/Enyim.Caching.Rendezvous.Tests/ --filter "FullyQualifiedName~TestMethodName"
 
+# Run integration tests only
+dotnet test tests/Enyim.Caching.Rendezvous.IntegrationTests/ -c Release
+
 # Skip the HTML report (text summary still prints)
 ./scripts/ci-local.sh --no-report
+
+# Run benchmarks (standalone, not in solution)
+./scripts/run-benchmarks.sh                          # all benchmarks
+./scripts/run-benchmarks.sh --filter '*HashAlgorithm*'  # filter by class
+
+# Run hash quality profiler (standalone, not in solution)
+./scripts/run-profiler.sh                            # console output
+./scripts/run-profiler.sh --format csv --output-dir profiler-results
+./scripts/run-profiler.sh --format json --output-dir profiler-results
 ```
 
 The pre-push hook (`.githooks/pre-push`) also runs `scripts/ci-local.sh` automatically. Configure it with: `git config core.hooksPath .githooks`.
@@ -43,4 +55,16 @@ The library plugs into EnyimMemcachedCore via two interfaces: `IMemcachedNodeLoc
 
 ## Testing
 
-Tests use xUnit with Moq. Hash algorithm tests are parameterized via `[Theory]`/`[InlineData(typeof(...))]` across all three hash types. Distribution tests assert <20% deviation from uniform across 10,000 keys.
+Tests use xUnit with Moq across two projects:
+
+- **Unit tests** (`tests/Enyim.Caching.Rendezvous.Tests/`) — hash algorithm correctness, locator behavior, factory, parser, and discovery service. Hash algorithm tests are parameterized via `[Theory]`/`[InlineData(typeof(...))]` across all three hash types. Distribution tests assert <20% deviation from uniform across 10,000 keys.
+- **Integration tests** (`tests/Enyim.Caching.Rendezvous.IntegrationTests/`) — end-to-end factory-to-locator pipeline, topology change monotonicity (node add/remove), concurrent read/write thread safety, and ElastiCache discovery-to-locator flow.
+
+Both projects are in the solution and run together via `dotnet test` and `ci-local.sh`.
+
+## Benchmarks & Profiler
+
+These are standalone projects (not in the solution) for on-demand performance and quality analysis.
+
+- **Benchmarks** (`benchmarks/Enyim.Caching.Rendezvous.Benchmarks/`) — BenchmarkDotNet suite covering hash algorithm throughput, locator scaling by node count, and key pattern impact. Run via `scripts/run-benchmarks.sh`.
+- **Hash profiler** (`tools/Enyim.Caching.Rendezvous.HashProfiler/`) — profiles all three hash algorithms across four quality metrics: chi-squared distribution uniformity, avalanche bit-flip diffusion, HRW monotonicity guarantees, and collision rates. Supports console, CSV, and JSON output. Run via `scripts/run-profiler.sh`.

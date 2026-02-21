@@ -140,6 +140,47 @@ For a key lookup, the algorithm:
 
 When a node is added, only ~1/N keys (where N is the new total) move to the new node. When a node is removed, only the keys that were on that node get redistributed — all other mappings remain stable.
 
+## Development
+
+### Running Tests
+
+```bash
+# All tests (unit + integration) with coverage
+./scripts/ci-local.sh
+
+# Unit tests only
+dotnet test tests/Enyim.Caching.Rendezvous.Tests/ -c Release
+
+# Integration tests only
+dotnet test tests/Enyim.Caching.Rendezvous.IntegrationTests/ -c Release
+```
+
+### Benchmarks
+
+A [BenchmarkDotNet](https://benchmarkdotnet.org/) suite compares hash algorithm throughput, locator scaling by node count, and key pattern impact.
+
+```bash
+./scripts/run-benchmarks.sh                             # all benchmarks
+./scripts/run-benchmarks.sh --filter '*HashAlgorithm*'  # filter by class
+```
+
+### Hash Quality Profiler
+
+A standalone profiler evaluates each hash algorithm across four quality metrics:
+
+- **Distribution** — chi-squared uniformity test
+- **Avalanche** — bit-flip diffusion (ideal: ~50% of bits change per single-bit input change)
+- **Monotonicity** — verifies zero spurious key moves on node add/remove (HRW guarantee)
+- **Collisions** — hash space utilization vs. birthday paradox expectation
+
+```bash
+./scripts/run-profiler.sh                                          # console output
+./scripts/run-profiler.sh --format csv --output-dir profiler-results  # CSV files
+./scripts/run-profiler.sh --format json --output-dir profiler-results # JSON report
+```
+
+Options: `--key-count`, `--node-count`, `--avalanche-iterations`. Exit code 1 if any threshold fails.
+
 ## License
 
 [Apache License 2.0](LICENSE)
