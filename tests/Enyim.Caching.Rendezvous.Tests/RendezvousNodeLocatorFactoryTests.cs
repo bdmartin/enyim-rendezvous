@@ -45,5 +45,24 @@ namespace Enyim.Caching.Rendezvous.Tests
         {
             Assert.Throws<ArgumentNullException>(() => new RendezvousNodeLocatorFactory(null));
         }
+
+        [Fact]
+        public void Initialize_Null_DoesNotThrow()
+        {
+            var factory = new RendezvousNodeLocatorFactory();
+            factory.Initialize(null);
+        }
+
+        [Fact]
+        public void Initialize_WithDictionary_DoesNotThrow()
+        {
+            var factory = new RendezvousNodeLocatorFactory();
+            var parameters = new System.Collections.Generic.Dictionary<string, string>
+            {
+                { "key1", "value1" },
+                { "key2", "value2" }
+            };
+            factory.Initialize(parameters);
+        }
     }
 }

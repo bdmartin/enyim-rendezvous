@@ -249,5 +249,56 @@ namespace Enyim.Caching.Rendezvous.Tests
             // Deterministic
             Assert.Same(result, locator.Locate("test-key"));
         }
+
+        [Fact]
+        public void Locate_AllNodesDead_ReturnsNull()
+        {
+            var nodes = new List<IMemcachedNode>
+            {
+                CreateMockNode("10.0.0.1", 11211, isAlive: false),
+                CreateMockNode("10.0.0.2", 11211, isAlive: false),
+                CreateMockNode("10.0.0.3", 11211, isAlive: false),
+            };
+
+            var locator = new RendezvousNodeLocator();
+            locator.Initialize(nodes);
+
+            Assert.Null(locator.Locate("mykey"));
+        }
+
+        [Fact]
+        public void Locate_AfterDispose_ThrowsObjectDisposedException()
+        {
+            var locator = new RendezvousNodeLocator();
+            locator.Initialize(new List<IMemcachedNode> { CreateMockNode("10.0.0.1", 11211) });
+            locator.Dispose();
+
+            Assert.Throws<ObjectDisposedException>(() => locator.Locate("mykey"));
+        }
+
+        [Fact]
+        public void Initialize_AfterDispose_ThrowsObjectDisposedException()
+        {
+            var locator = new RendezvousNodeLocator();
+            locator.Dispose();
+
+            Assert.Throws<ObjectDisposedException>(() =>
+                locator.Initialize(new List<IMemcachedNode> { CreateMockNode("10.0.0.1", 11211) }));
+        }
+
+        [Fact]
+        public void GetWorkingNodes_AfterDispose_ThrowsObjectDisposedException()
+        {
+            var locator = new RendezvousNodeLocator();
+            locator.Dispose();
+
+            Assert.Throws<ObjectDisposedException>(() => locator.GetWorkingNodes());
+        }
+
+        [Fact]
+        public void Constructor_NullHash_ThrowsArgumentNullException()
+        {
+            Assert.Throws<ArgumentNullException>(() => new RendezvousNodeLocator(null));
+        }
     }
 }
