@@ -12,8 +12,9 @@ namespace Enyim.Caching.Rendezvous
     /// Factory that creates <see cref="RendezvousNodeLocator"/> instances
     /// for use with the Enyim memcached client.
     ///
-    /// Supports configuration via <see cref="Initialize"/> parameters:
-    ///   "hashAlgorithm" = "fnv1a" (default) | "murmur3" | "sha256"
+    /// Hash algorithm selection is done via the constructor. Use the
+    /// parameterized constructor to inject a custom <see cref="IRendezvousHash"/>.
+    /// The <see cref="Initialize"/> method exists for interface compliance only.
     /// </summary>
     public class RendezvousNodeLocatorFactory : IProviderFactory<IMemcachedNodeLocator>
     {
