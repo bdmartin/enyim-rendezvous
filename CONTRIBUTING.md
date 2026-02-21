@@ -7,19 +7,49 @@ Thanks for your interest in contributing to enyim-rendezvous!
 - [.NET 8 SDK](https://dotnet.microsoft.com/download) or later
 - A memcached instance is **not** required — all tests run without external services
 
+## Setup
+
+After cloning, configure git to use the project's hooks directory:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+This enables a **pre-push hook** that runs the same CI checks that run in GitHub Actions, so you'll catch failures before pushing.
+
+## Local CI Checks
+
+A single script — `scripts/ci-local.sh` — defines all CI validation steps. The same script is used by:
+
+- **GitHub Actions** (`ci.yml`) — runs on every push/PR to `main`
+- **Pre-push hook** (`.githooks/pre-push`) — runs before every `git push`
+- **Manual invocation** — run it directly whenever you want
+
+```bash
+# Run all CI checks (restore, Release build, test with coverage)
+./scripts/ci-local.sh
+
+# Also generate an HTML coverage report
+./scripts/ci-local.sh --report
+```
+
+The `--report` flag requires [reportgenerator](https://github.com/danielpalme/ReportGenerator). Install it with:
+
+```bash
+dotnet tool install -g dotnet-reportgenerator-globaltool
+```
+
+Coverage output (Cobertura XML) is written to the `coverage/` directory.
+
 ## Workflow
 
 1. Fork the repository and create a feature branch from `main`
 2. Make your changes
-3. Ensure the build passes with zero warnings:
+3. Run CI checks locally:
    ```bash
-   dotnet build --configuration Release
+   ./scripts/ci-local.sh
    ```
-4. Ensure all tests pass:
-   ```bash
-   dotnet test --configuration Release
-   ```
-5. Open a pull request against `main`
+4. Open a pull request against `main`
 
 ## Code Style
 
