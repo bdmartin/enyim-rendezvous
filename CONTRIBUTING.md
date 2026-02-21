@@ -26,20 +26,14 @@ A single script — `scripts/ci-local.sh` — defines all CI validation steps. T
 - **Manual invocation** — run it directly whenever you want
 
 ```bash
-# Run all CI checks (restore, Release build, test with coverage)
+# Run all CI checks (restore, Release build, test with coverage + summary)
 ./scripts/ci-local.sh
 
-# Also generate an HTML coverage report
-./scripts/ci-local.sh --report
+# Skip the HTML report (text summary still prints)
+./scripts/ci-local.sh --no-report
 ```
 
-The `--report` flag requires [reportgenerator](https://github.com/danielpalme/ReportGenerator). Install it with:
-
-```bash
-dotnet tool install -g dotnet-reportgenerator-globaltool
-```
-
-Coverage output (Cobertura XML) is written to the `coverage/` directory.
+The script prints a per-class coverage summary to the console and generates an HTML report in `coverage/report/index.html`. The `reportgenerator` tool is managed as a local dotnet tool — `dotnet tool restore` runs automatically.
 
 ## Workflow
 

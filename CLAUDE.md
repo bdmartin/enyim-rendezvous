@@ -9,14 +9,14 @@ A .NET library that implements Rendezvous (Highest Random Weight) hashing as a n
 ## Build & Test Commands
 
 ```bash
-# Run all CI checks (restore, Release build, test with coverage) — same as GitHub Actions
+# Run all CI checks (restore, Release build, test with coverage summary + HTML report)
 ./scripts/ci-local.sh
 
 # Run a single test by name
 dotnet test tests/Enyim.Caching.Rendezvous.Tests/ --filter "FullyQualifiedName~TestMethodName"
 
-# Generate HTML coverage report (requires dotnet-reportgenerator-globaltool)
-./scripts/ci-local.sh --report
+# Skip the HTML report (text summary still prints)
+./scripts/ci-local.sh --no-report
 ```
 
 The pre-push hook (`.githooks/pre-push`) also runs `scripts/ci-local.sh` automatically. Configure it with: `git config core.hooksPath .githooks`.
