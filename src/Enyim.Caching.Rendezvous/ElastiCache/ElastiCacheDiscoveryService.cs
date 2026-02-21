@@ -43,6 +43,10 @@ namespace Enyim.Caching.Rendezvous.ElastiCache
         /// </summary>
         public event EventHandler<ClusterNodesChangedEventArgs> NodesChanged;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ElastiCacheDiscoveryService"/> class.
+        /// </summary>
+        /// <param name="options">Configuration options including the endpoint and polling interval.</param>
         public ElastiCacheDiscoveryService(ElastiCacheDiscoveryOptions options)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
@@ -188,6 +192,9 @@ namespace Enyim.Caching.Rendezvous.ElastiCache
             }
         }
 
+        /// <summary>
+        /// Stops polling and releases all resources.
+        /// </summary>
         public void Dispose()
         {
             if (_disposed)
@@ -208,13 +215,21 @@ namespace Enyim.Caching.Rendezvous.ElastiCache
     /// </summary>
     public class ClusterNodesChangedEventArgs : EventArgs
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClusterNodesChangedEventArgs"/> class.
+        /// </summary>
+        /// <param name="configVersion">The cluster configuration version that triggered the change.</param>
+        /// <param name="nodes">The updated list of cluster nodes.</param>
         public ClusterNodesChangedEventArgs(int configVersion, IReadOnlyList<ClusterNode> nodes)
         {
             ConfigVersion = configVersion;
             Nodes = nodes;
         }
 
+        /// <summary>Gets the cluster configuration version that triggered the change.</summary>
         public int ConfigVersion { get; }
+
+        /// <summary>Gets the updated list of cluster nodes.</summary>
         public IReadOnlyList<ClusterNode> Nodes { get; }
     }
 }

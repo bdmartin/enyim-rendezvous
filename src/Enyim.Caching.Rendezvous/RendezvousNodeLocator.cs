@@ -139,6 +139,9 @@ namespace Enyim.Caching.Rendezvous
             }
         }
 
+        /// <summary>
+        /// Releases the internal read-write lock.
+        /// </summary>
         public void Dispose()
         {
             if (!_disposed)

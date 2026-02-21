@@ -33,11 +33,18 @@ namespace Enyim.Caching.Rendezvous
             _hash = hash ?? throw new ArgumentNullException(nameof(hash));
         }
 
+        /// <summary>
+        /// Creates a new <see cref="RendezvousNodeLocator"/> using the configured hash algorithm.
+        /// </summary>
         public IMemcachedNodeLocator Create()
         {
             return new RendezvousNodeLocator(_hash);
         }
 
+        /// <summary>
+        /// Exists for <see cref="IProviderFactory{T}"/> interface compliance.
+        /// Hash algorithm selection is done via the constructor; this method is a no-op.
+        /// </summary>
         public void Initialize(Dictionary<string, string> parameters)
         {
             // When used via config-based initialization, the hash algorithm
