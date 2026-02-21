@@ -27,7 +27,8 @@ namespace Enyim.Caching.Rendezvous.Hashing
             }
 
             // Separator to prevent collisions between key/node boundaries
-            hash ^= 0;
+            // (e.g., hash("ab","c") vs hash("a","bc") would collide without this)
+            hash ^= 0xFF;
             hash *= FnvPrime;
 
             // Hash the node bytes
