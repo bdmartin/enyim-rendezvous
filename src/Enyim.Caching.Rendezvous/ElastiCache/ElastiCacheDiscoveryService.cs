@@ -31,10 +31,11 @@ namespace Enyim.Caching.Rendezvous.ElastiCache
     public sealed class ElastiCacheDiscoveryService : IDisposable
     {
         private readonly ElastiCacheDiscoveryOptions _options;
+        private readonly object _syncLock = new object();
         private Timer _pollTimer;
         private int _lastConfigVersion = -1;
         private IReadOnlyList<ClusterNode> _lastNodes = Array.Empty<ClusterNode>();
-        private bool _disposed;
+        private volatile bool _disposed;
 
         /// <summary>
         /// Fires when the set of cluster nodes changes. The event args
@@ -54,13 +55,24 @@ namespace Enyim.Caching.Rendezvous.ElastiCache
         /// <summary>
         /// Gets the most recently discovered cluster nodes.
         /// </summary>
-        public IReadOnlyList<ClusterNode> CurrentNodes => _lastNodes;
+        public IReadOnlyList<ClusterNode> CurrentNodes
+        {
+            get { lock (_syncLock) { return _lastNodes; } }
+        }
 
         /// <summary>
         /// Gets the most recently seen configuration version.
         /// Returns -1 if no successful poll has occurred yet.
         /// </summary>
-        public int CurrentConfigVersion => _lastConfigVersion;
+        public int CurrentConfigVersion
+        {
+            get { lock (_syncLock) { return _lastConfigVersion; } }
+        }
+
+        /// <summary>
+        /// Gets the last exception encountered during polling, or null if the last poll succeeded.
+        /// </summary>
+        public Exception LastError { get; private set; }
 
         /// <summary>
         /// Starts the background polling timer. Performs an initial poll immediately.
@@ -102,19 +114,32 @@ namespace Enyim.Caching.Rendezvous.ElastiCache
                 string response = SendConfigCommand(_options.ConfigurationEndpoint);
                 var (version, nodes) = ClusterConfigParser.Parse(response);
 
-                if (version != _lastConfigVersion)
+                lock (_syncLock)
                 {
-                    _lastConfigVersion = version;
-                    _lastNodes = nodes;
-                    NodesChanged?.Invoke(this, new ClusterNodesChangedEventArgs(version, nodes));
+                    if (version != _lastConfigVersion)
+                    {
+                        _lastConfigVersion = version;
+                        _lastNodes = nodes;
+                        NodesChanged?.Invoke(this, new ClusterNodesChangedEventArgs(version, nodes));
+                    }
                 }
 
+                LastError = null;
                 return nodes;
             }
-            catch
+            catch (SocketException ex)
             {
-                // Swallow exceptions during polling — the cluster continues
-                // operating with the last known configuration.
+                LastError = ex;
+                return null;
+            }
+            catch (TimeoutException ex)
+            {
+                LastError = ex;
+                return null;
+            }
+            catch (FormatException ex)
+            {
+                LastError = ex;
                 return null;
             }
         }
@@ -123,10 +148,21 @@ namespace Enyim.Caching.Rendezvous.ElastiCache
         {
             using (var socket = new Socket(endpoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp))
             {
+                // Use BeginConnect + WaitOne to enforce the connection timeout.
+                // Socket.Connect() is synchronous and ignores SendTimeout/ReceiveTimeout,
+                // so setting those before Connect would have no effect on connection time.
+                var connectResult = socket.BeginConnect(endpoint, null, null);
+                bool connected = connectResult.AsyncWaitHandle.WaitOne(_options.ConnectionTimeout);
+                if (!connected)
+                {
+                    socket.Close();
+                    throw new TimeoutException(
+                        $"Timed out connecting to {endpoint} after {_options.ConnectionTimeout.TotalSeconds}s.");
+                }
+                socket.EndConnect(connectResult);
+
                 socket.SendTimeout = (int)_options.ConnectionTimeout.TotalMilliseconds;
                 socket.ReceiveTimeout = (int)_options.ReceiveTimeout.TotalMilliseconds;
-
-                socket.Connect(endpoint);
 
                 var command = Encoding.ASCII.GetBytes("config get cluster\r\n");
                 socket.Send(command);
@@ -143,7 +179,8 @@ namespace Enyim.Caching.Rendezvous.ElastiCache
                     responseBuilder.Append(Encoding.ASCII.GetString(buffer, 0, bytesRead));
 
                     // ElastiCache terminates the response with "END\r\n"
-                    if (responseBuilder.ToString().Contains("END"))
+                    string response = responseBuilder.ToString();
+                    if (response.EndsWith("END\r\n"))
                         break;
                 }
 
@@ -153,11 +190,16 @@ namespace Enyim.Caching.Rendezvous.ElastiCache
 
         public void Dispose()
         {
-            if (!_disposed)
-            {
-                _pollTimer?.Dispose();
-                _disposed = true;
-            }
+            if (_disposed)
+                return;
+
+            _disposed = true;
+
+            // Timer.Dispose(WaitHandle) blocks until any in-flight callback completes
+            var waitHandle = new ManualResetEvent(false);
+            if (_pollTimer != null && _pollTimer.Dispose(waitHandle))
+                waitHandle.WaitOne();
+            waitHandle.Dispose();
         }
     }
 
