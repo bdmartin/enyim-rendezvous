@@ -149,5 +149,43 @@ namespace Enyim.Caching.Rendezvous.Tests
             var node = new ClusterNode("host.com", IPAddress.Parse("10.0.0.1"), 11211);
             Assert.Equal("host.com|10.0.0.1|11211", node.ToString());
         }
+
+        [Fact]
+        public void ClusterNode_Equals_Null_ReturnsFalse()
+        {
+            var node = new ClusterNode("host.com", IPAddress.Parse("10.0.0.1"), 11211);
+            Assert.False(node.Equals((ClusterNode)null));
+        }
+
+        [Fact]
+        public void ClusterNode_Equals_NonClusterNode_ReturnsFalse()
+        {
+            var node = new ClusterNode("host.com", IPAddress.Parse("10.0.0.1"), 11211);
+            Assert.False(node.Equals("not a cluster node"));
+        }
+
+        [Fact]
+        public void ClusterNode_Equals_CaseInsensitiveHostname()
+        {
+            var node1 = new ClusterNode("HOST.COM", IPAddress.Parse("10.0.0.1"), 11211);
+            var node2 = new ClusterNode("host.com", IPAddress.Parse("10.0.0.1"), 11211);
+
+            Assert.Equal(node1, node2);
+            Assert.Equal(node1.GetHashCode(), node2.GetHashCode());
+        }
+
+        [Fact]
+        public void ClusterNode_Constructor_NullHostname_Throws()
+        {
+            Assert.Throws<ArgumentNullException>(
+                () => new ClusterNode(null, IPAddress.Parse("10.0.0.1"), 11211));
+        }
+
+        [Fact]
+        public void ClusterNode_Constructor_NullIpAddress_Throws()
+        {
+            Assert.Throws<ArgumentNullException>(
+                () => new ClusterNode("host.com", null, 11211));
+        }
     }
 }
