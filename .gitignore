@@ -1,0 +1,28 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.docstates
+*.dll
+*.pdb
+*.nupkg
+
+## IDE
+.vs/
+.vscode/
+*.swp
+*~
+.idea/
+
+## Build
+[Bb]uild[Ll]og.*
+[Dd]ebug/
+[Rr]elease/
+TestResults/
+
+## NuGet
+packages/
+*.nupkg
+project.lock.json
