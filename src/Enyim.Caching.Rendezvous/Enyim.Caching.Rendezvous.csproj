@@ -22,7 +22,7 @@
   <ItemGroup>
     <PackageReference Include="EnyimMemcachedCore" Version="2.6.6" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.203" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.300" PrivateAssets="All" />
   <PackageReference Include="System.Text.Encodings.Web" Version="10.0.8" />
   </ItemGroup>
 
